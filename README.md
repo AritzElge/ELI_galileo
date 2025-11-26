@@ -1,4 +1,6 @@
-# Embedded Linux Modbus Master Controller
+# [Project Title: Embedded Linux Modbus Master]
+
+[![ShellCheck Static Analysis](https://github.com/AritzElge/Embedded-Linux-Modbus-Master/actions/workflows/shellcheck_analysis.yml/badge.svg)](https://github.com/AritzElge/Embedded-Linux-Modbus-Master/actions/workflows/shellcheck_analysis.yml)
 
 This repository presents an isolated master embedded control system implemented on an Intel Galileo Gen 2 (embedded Linux). The project demonstrates a rigorous engineering approach by developing software ranging from high-level scripts to optimized native C code with inline x86 assembly for efficient and deterministic hardware control.
 
@@ -11,8 +13,14 @@ The goal is to control a Modbus TCP/IP network, prioritizing reliability, determ
 *   **Communication Protocol:** Modbus TCP/IP.
 *   **Hardware Interfaces:** SPI (for LCD), GPIO (for multiplexer and LED control), Ethernet (for Modbus communication).
 *   **Methodology:** Use of native POSIX APIs, BSD Sockets, `libmodbus`, `pthreads`, and POSIX shared memory (IPC).
+*   **Build System Tool:** **Buildroot** (used to generate the toolchain and the final Linux image).
+* Integration of advanced static analysis: **CppcCheck** (with **MISRA C:2012** rules) and **ShellCheck** to ensure safety and compliance with coding standards in critical enviroments.
+* Full automation of the Continuous Integration (CI) using **GitHub Actions**.
 
 ## Software Architecture
+
+* **Modular Architecture:** Application software is decoupled from the base operating system.
+* **Package Management:** Daemons are packaged as standard `.deb` packages that facilitate dependency management and incremental updates.
 
 The system consists of several daemons that communicate internally:
 
@@ -22,15 +30,16 @@ The system consists of several daemons that communicate internally:
 
 ## Key Engineering Decisions
 
+*   **Hybrid CI/CD Strategy:** Decision not to compile the entire Buildroot image in the cloud due to the performance and time limitations of public CI/CD runners. Instead, the validation (MISRA, unit tests) and packaging of the application software are prioritized.
+*   **Reproducibility of the Buildroot: Use of bash scripts and `defconfig` files to automate the complete configuration of the Buildroot workspace, ensuring reproducible builds locally without manual intervention.
 *   **Multi-Level Approach:** The same functionality (e.g., I/O control) has been implemented in Bash, Python and C to demonstrate the trade-offs of performance and control at each level of abstraction.
 *   **Resource Management (RAII):** Use of modern C++ and the RAII pattern for safe and automatic management of file descriptors and shared memory.
 *   **Network Security:** Use of static ARP tables (configurable upon deployment) to mitigate ARP spoofing attacks.
 
 ## System Requirements
 
-*   Host PC with Linux (for cross-compilation).
+*   Host PC with Linux (for cross-compilation) and python2 compatibility.
 *   Intel Galileo Gen 2 board.
-*   Necessary libraries (e.g., `libmodbus`).
 
 ## Compilation and Deployment Instructions
 
@@ -61,15 +70,16 @@ This is the industrial-grade method. Binaries are compiled directly into the fin
 3.  Deploy the generated image to the Galileo's SD card.
 4.  The static ARP table configuration is included in the read-only `rootfs` startup scripts during compilation.
 
-## Technical Features (Revised)
+### Final Production/Deployment
 
-*   **Master Platform:** Intel Galileo Gen 2 (Quark SoC X1000, Linux).
-*   **Languages Used:** Ash shell, Python 3, Native C, Modern C++.
-*   **Communication Protocol:** Modbus TCP/IP.
-*   **Hardware Interfaces:** SPI (for LCD), GPIO (for multiplexer and LED control), Ethernet (for Modbus communication).
-*   **Methodology:** Use of native POSIX APIs, BSD Sockets, `libmodbus`, `pthreads`, and POSIX shared memory (IPC).
-*   **Build System Tool:** **Buildroot** (used to generate the toolchain and the final Linux image).
-
+1. Point 1 (CI): The GitHub Actions workflow compiles , test, and generates the validated `.deb` artifact
+2. Point 2 (Local Preparation): The ./download_buildroot.sh script handles:
+    * Installing buildroot dependencies for the project
+    * Cloning the legacy version of Buildroot
+    * **Downloading the latest validates .deb package from GitHub Actions.**
+    * Applying the master configuration (.`defconfig`) automatically
+3. Point 3 (Image generation): It could be automated, but for flexibility with Host PCs it's manually made.
+    * make `galileo_defconfig && make -j N` (where `N` is the number of threads you want to use
 
 ## Contributions and License
 
