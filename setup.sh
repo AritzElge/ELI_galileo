@@ -6,7 +6,7 @@ REPO_URL="git://git.buildroot.net/buildroot.git"
 
 # Install Buildroot dependencies
 
-sudo ./install_dependencies.sh
+sudo ./scripts/install_dependencies.sh
 EXIT_STATUS=$?
 
 # Controll return from script
@@ -22,7 +22,8 @@ echo "[INFO] Dependency installation finished successfully. Proceeding with Buil
 cd "$(dirname "$0")" || exit 1
 
 echo " Starting Buildroot download for Galileo Gen 2"
-
+mkdir galileo || exit 1
+cd galileo || exit 1
 # -- Step1: Clone the Buildroot repository --
 if [ ! -d ".git" ]; then
 	echo "[INFO] .git directory not found. Cloning repository..."

@@ -23,7 +23,8 @@ build/
 # External dependencies and thrid-party folders
 #
 # Ignore the buildroot/ folder inside src/galileo-master/
-src/galileo-master/buildroot/
+galileo/buildroot/
+galileo/
 
 # Temporary files specific to the operating system (macOS, Windows, Linux)
 #

@@ -1,4 +1,4 @@
-name: ShellCheck Static Analysis
+name: Static Analysis (ShellCheck & CppCheck)
 
 # Trigger this workflow on every 'push' or 'pull request' to the main branch
 on:
@@ -10,13 +10,29 @@ on:
     branches: [ main ]
 
 jobs:
-  shellcheck_analyze:
+  static_analisys:
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
     - name: Install ShellCheck
       run: sudo apt-get update && sudo apt-get install -y shellcheck
+
     - name: Run ShellCheck on all Bash scripts
       run: |
         find . -name "*.sh" -print0 | xargs -0 shellcheck
+
+    - name: Install Cppcheck
+      id: cppcheck_run
+      run: |
+	# Use 'find' to locato every .c in the repository
+	cppcheck --enable=all --std=c99 -D_POSIX_C_SOURCE=200809L \
+	--xml --ouput-file=cppcheck_results.xml %(find . -name "*.c") || true
+  
+    - name: Upload Cppcheck results artifact
+      uses: actions/upload-artifact@v3
+      with:
+	name: cppcheck-results
+	path: cppcheck_results.xml
+
+    
