@@ -1,6 +1,7 @@
 # Embedded Linux Integration with Intel Galileo Gen 2 (or ELI_galileo)
 
-![Project Status](https://img.shields.io/badge/Project Status-WIP)
+![Project Status](https://img.shields.io/badge/Project_Status-WIP-blue)
+
 [![Static Analysis](https://github.com/AritzElge/ELI_galileo/actions/workflows/static_analysis.yml/badge.svg)](https://github.com/AritzElge/ELI_galileo/actions/workflows/static_analysis.yml)
 
 This repository presents a master home automation control system designed to operate on an Intel Galileo Gen 2, utilizing MODBUS TCP/IP for managing smart sensors and actuators within the local network.
@@ -20,10 +21,10 @@ This project was selected as a technical challenge due to the platform's discont
 - [Usage and Functionality](#usage-and-functionality)
 - [System Updates](#system-updates)
 - [Roadmap](#roadmap)
-- [Acknowledgements](#Acknowledgements)
+- [Acknowledgements](#acknowledgements)
 - [Contributing](CONTRIBUTING.md)
 - [License](LICENSE)
-- [Contact](#Contact)
+- [Contact](#contact)
 
 ---    
 
