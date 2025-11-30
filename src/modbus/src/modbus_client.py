@@ -17,8 +17,11 @@ Note:
 """
 
 from datetime import datetime
+from filelock import FileLock
 from pymodbus.client.sync import ModbusTcpClient
 
+# Mutex file for FileLock:
+MODBUS_CLIENT_MUTEX = "/tmp/modbus_client.lock" 
 
 def get_sensor_reg(slave_label, slave_ip, coms_port, data_length):
     """
@@ -36,17 +39,18 @@ def get_sensor_reg(slave_label, slave_ip, coms_port, data_length):
     Returns:
         None: Prints result or error to stdout.
     """
-    client = ModbusTcpClient(slave_ip, port=coms_port)
-    client.connect()
+    with FileLock(MODBUS_CLIENT_MUTEX):
+        client = ModbusTcpClient(slave_ip, port=coms_port)
+        client.connect()
 
-    result = client.read_holding_registers(address=0, count=data_length, slave=1)
-    if not result.isError():
-        print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} : {slave_label} : "
-              f"{slave_ip} : {coms_port} : {result.registers}")
-    else:
-        print("Error:", result)
+        result = client.read_holding_registers(address=0, count=data_length, slave=1)
+        if not result.isError():
+            print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} : {slave_label} : "
+                f"{slave_ip} : {coms_port} : {result.registers}")
+        else:
+            print("Error:", result)
 
-    client.close()
+        client.close()
 
 
 def set_actuator_reg(actuator_label, actuator_ip, coms_port, register_address, value):
@@ -66,14 +70,15 @@ def set_actuator_reg(actuator_label, actuator_ip, coms_port, register_address, v
     Returns:
         None: Prints result or error to stdout.
     """
-    client = ModbusTcpClient(actuator_ip, port=coms_port)
-    client.connect()
+    with FileLock(MODBUS_CLIENT_MUTEX):
+        client = ModbusTcpClient(actuator_ip, port=coms_port)
+        client.connect()
 
-    result = client.write_register(address=register_address, value=value, device_id=1)
-    if not result.isError():
-        print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} : {actuator_label} : "
-              f"{actuator_ip} : {coms_port} : SET {register_address} = {value}")
-    else:
-        print("Error:", result)
+        result = client.write_register(address=register_address, value=value, device_id=1)
+        if not result.isError():
+            print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} : {actuator_label} : "
+                f"{actuator_ip} : {coms_port} : SET {register_address} = {value}")
+        else:
+            print("Error:", result)
 
-    client.close()
+        client.close()

@@ -1,0 +1,42 @@
+[
+    {
+        "start_time": "22:00",
+        "label": "Bilnder_1",
+        "ip": "XXX.XXX.XXX.XXX",
+        "port": 5020,
+        "register_address": 1,
+        "valor": "APAGADO"
+    },
+    {
+        "start_time": "22:00",
+        "label": "Bilnder_1",
+        "ip": "XXX.XXX.XXX.XXX",
+        "port": 5020,
+        "register_address": 1,
+        "valor": "APAGADO"
+    },
+    {
+        "start_time": "22:00",
+        "label": "Bilnder_1",
+        "ip": "XXX.XXX.XXX.XXX",
+        "port": 5020,
+        "register_address": 1,
+        "valor": "APAGADO"
+    },
+    {
+        "start_time": "22:00",
+        "label": "Bilnder_1",
+        "ip": "XXX.XXX.XXX.XXX",
+        "port": 5020,
+        "register_address": 1,
+        "valor": "APAGADO"
+    },
+    {
+        "start_time": "22:00",
+        "label": "Bilnder_1",
+        "ip": "XXX.XXX.XXX.XXX",
+        "port": 5020,
+        "register_address": 1,
+        "valor": "APAGADO"
+    }
+]

@@ -1,59 +1,55 @@
 """
 Modbus Polling Daemon
 
-Reads device configurations from 'slaves.json' and performs a single Modbus TCP
-polling cycle. Designed to be executed periodically via cron or shell script.
+Reads device configurations from 'sensors.json' and performs a single Modbus TCP
+polling cycle. Uses a JSON-specific filelock, then calls the hardware client which
+manages the hardware lock internally.
 
 Functions:
-    get_sensor_reg: Read holding registers from a sensor device.
-    set_actuator_reg: Write a value to an actuator register.
+    run_polling_daemon: Main execution function to coordinate polling.
 
 Dependencies:
     modbus_client: Provides Modbus communication functions.
-    slaves.json: Configuration file with device details.
-
-Configuration File: slaves.json
-.. code-block:: json
-
-    [
-        {
-            "type": "sensor" | "actuator",
-            "label": "Device name (str)",
-            "ip": "IP address (str)",
-            "port": "Modbus port (int)",
-            "length": "Number of registers to read (int, sensor only)",
-            "register_address": "Target register (int, actuator only)"
-        }
-    ]
-
-Execution:
-    Via cron (recommended):
-        */15 * * * * python polling_daemon.py >> modbus.log 2>> error.log
-
-    Via shell script:
-        .. code-block:: sh
-
-            #!/bin/sh
-            while true; do
-                python polling_daemon.py >> modbus.log 2>> error.log
-                sleep 900
-            done
+    sensors.json: Configuration file with device details.
+...
 """
 
 import json
-from modbus_client import get_sensor_reg, set_actuator_reg
+from filelock import FileLock
+from modbus_client import get_sensor_reg
+
+# Mutex to protect the sensors.json file ONLY
+SENSORS_JSON_LOCK = "/tmp/sensors_app.lock"
+SENSORS_FILE = "sensors.json"
 
 def run_polling_daemon():
-    '''Start of the polling loop'''
-    with open("slaves.json", "r") as f:
-        devices = json.load(f)
+    """
+    Main daemon function to execute a single polling cycle of Modbus devices.
 
-    # Procesa cada dispositivo
+    This function coordinates the following steps:
+    1. Acquires a filelock specific to the 'slaves.json' file.
+    2. Reads the device configurations into memory.
+    3. Releases the filelock immediately after reading.
+    4. Iterates through the loaded configurations and calls the Modbus client
+       function for each sensor (which handles the hardware-level mutex internally).
+    """
+
+    devices = []
+    
+    # --- 1. LOCK, READ JSON, AND RELEASE JSON MUTEX ---
+    with FileLock(SENSORS_JSON_LOCK):
+        print(f"Process {os.getpid()}: JSON Mutex acquired for reading sensors.json.")
+        with open(SENSORS_FILE, "r") as f:
+            devices = json.load(f)
+        print(f"Process {os.getpid()}: JSON Mutex released.")
+    # The JSON mutex is released here.
+
+    # --- 2. USE THE LOADED DATA (OUTSIDE THE JSON MUTEX) ---
+    # Process each device. The function called internally uses the hardware mutex.
     for device in devices:
-        if device["type"] == "sensor":
+        if device.get("type") == "sensor":
+            print(f"Calling get_sensor_reg for {device['label']} (will use hardware mutex internally)...")
             get_sensor_reg(device["label"], device["ip"], device["port"], device["length"])
-        elif device["type"] == "actuator":
-            set_actuator_reg(device["label"], device["ip"], device["port"], device["register_address"], 1)
 
 if __name__ == "__main__":
     run_polling_daemon()
