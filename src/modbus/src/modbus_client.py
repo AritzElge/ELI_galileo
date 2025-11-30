@@ -1,0 +1,79 @@
+"""
+Modbus TCP Client Module
+
+Provides functions to communicate with Modbus TCP slave devices for
+industrial and embedded applications. Includes support for reading
+sensor data (function 0x03) and writing to actuators (function 0x06).
+
+Functions:
+    get_sensor_reg: Read holding registers from a sensor.
+    set_actuator_reg: Write a single register to control an actuator.
+
+Dependencies:
+    pymodbus: Must be installed (compatible with v1.5+ for legacy systems).
+
+Note:
+    Designed for use with polling_daemon.py and slaves.json configuration.
+"""
+
+from datetime import datetime
+from pymodbus.client.sync import ModbusTcpClient
+
+
+def get_sensor_reg(slave_label, slave_ip, coms_port, data_length):
+    """
+    Read holding registers from a Modbus TCP sensor.
+
+    Performs a Modbus function 0x03 (Read Holding Registers) request to retrieve
+    sensor data from a remote device.
+
+    Args:
+        slave_label (str): Human-readable name for the sensor.
+        slave_ip (str): IP address of the Modbus slave device.
+        coms_port (int): TCP port number (typically 502 or 5020).
+        data_length (int): Number of contiguous registers to read.
+
+    Returns:
+        None: Prints result or error to stdout.
+    """
+    client = ModbusTcpClient(slave_ip, port=coms_port)
+    client.connect()
+
+    result = client.read_holding_registers(address=0, count=data_length, slave=1)
+    if not result.isError():
+        print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} : {slave_label} : "
+              f"{slave_ip} : {coms_port} : {result.registers}")
+    else:
+        print("Error:", result)
+
+    client.close()
+
+
+def set_actuator_reg(actuator_label, actuator_ip, coms_port, register_address, value):
+    """
+    Write a value to a single register of a Modbus TCP actuator.
+
+    Performs a Modbus function 0x06 (Write Single Register) request to control
+    an actuator.
+
+    Args:
+        actuator_label (str): Human-readable name for the actuator.
+        actuator_ip (str): IP address of the Modbus slave device.
+        coms_port (int): TCP port number.
+        register_address (int): Target register address (0-65535).
+        value (int): Value to write (0-65535).
+
+    Returns:
+        None: Prints result or error to stdout.
+    """
+    client = ModbusTcpClient(actuator_ip, port=coms_port)
+    client.connect()
+
+    result = client.write_register(address=register_address, value=value, device_id=1)
+    if not result.isError():
+        print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} : {actuator_label} : "
+              f"{actuator_ip} : {coms_port} : SET {register_address} = {value}")
+    else:
+        print("Error:", result)
+
+    client.close()
