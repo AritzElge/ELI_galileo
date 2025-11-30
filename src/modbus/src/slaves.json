@@ -1,0 +1,16 @@
+[
+    {
+        "type": "sensor",
+        "label": "Temp_Sensor_1",
+        "ip": "XXX.XXX.XXX.XXX",
+        "port": 5020,
+        "length": 2
+    },
+    {
+        "type": "actuator",
+        "label": "Bilnder_1",
+        "ip": "XXX.XXX.XXX.XXX",
+        "port": 5020,
+        "register_address": 1
+    }
+]   
