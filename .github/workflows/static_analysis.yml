@@ -1,4 +1,4 @@
-name: Static Analysis (ShellCheck & CppCheck)
+name: Static Analysis
 
 # Trigger this workflow on every 'push' or 'pull request' to the main branch
 on:
@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    # --- ShellCheck Steps ---
     - uses: actions/checkout@v4
     - name: Install ShellCheck
       run: sudo apt-get update && sudo apt-get install -y shellcheck
@@ -19,6 +20,7 @@ jobs:
     - name: Run ShellCheck on all Bash scripts
       run: find . -name "*.sh" -print0 | xargs -0 shellcheck
 
+    # --- CppCheck Steps ---
     - name: Install Cppcheck
       run: sudo apt-get install -y cppcheck
 
@@ -34,4 +36,9 @@ jobs:
         name: cppcheck-results
         path: cppcheck_results.xml
 
-    
+    # --- Pylint Steps ---
+    - name: Install Pylint
+      run: pip install pylint
+
+    - name: Run Pylint on all Python scripts
+      run: pylint $(find . -name "*.py")
