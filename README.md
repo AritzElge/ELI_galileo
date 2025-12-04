@@ -33,7 +33,7 @@ This project was selected as a technical challenge due to the platform's discont
 *   **MODBUS TCP/IP Management:** Full communication and control of smart devices (sensors and actuators) over the local network.
 *   **SPI Interface:** Control of an LCD screen for local system status and error visualization.
 *   **Data Persistence:** Use of an external USB-HDD to store daemons and logs, mitigating the degradation of the OS microSD card.
-*   **Secure Updates:** *In-situ* update mechanism via a USB pendrive and `dpkg` package management with version verification.
+*   **Secure Updates:** *In-situ* update mechanism via a USB pendrive and package management with version verification.
 *   **Visual Diagnostics:** Status LED for error code indication.
 *   **Static ARP-Table:** for protection agains ARP-Poisoning. 
 
@@ -62,7 +62,7 @@ This project was selected as a technical challenge due to the platform's discont
 ## Software Architecture
 
 * **Modular Architecture:** Application software is decoupled from the base operating system.
-* **Package Management:** Daemons are packaged as standard `.deb` packages that facilitate dependency management and incremental updates.
+* **Package Management:** Daemons are packaged as standard `.ipk` packages that facilitate dependency management and incremental updates.
 
 The system consists of several daemons that communicate internally:
 
@@ -121,41 +121,40 @@ Interaction with the system is primarily done via SSH for maintenance and monito
 
 *Note: The user interface via the LCD is still in the early stages of development.*
 
-andard build tools installed
-*   A MicroSD Card reader/writer connected to your PC.
-
-
 ## System Updates
 
 The system can be updated in the field using a USB pendrive containing the new `.deb` file.
 
-1.  Copy the `ELI-galileo-vX.Y.Z.deb` file to the root directory of the USB drive.
+1.  Copy the `ELI-galileo-vX.Y.Z.ipk` file to the root directory of the USB drive.
 2.  Insert the USB drive into the Galileo.
-3.  The update script will detect .deb package, verify it is newer than the current version installed on the HDD, and proceed with `dpkg -i`.
+3.  The update script will detect .ipk package, verify it is newer than the current version installed on the HDD.
 
 ## Roadmap
 
-The project is currently in active development. Below are our goals for upcoming releases.
+The project is currently in active development. Below are the goals for upcoming releases.
 
 - **Version 0.9.0 (Q4 2025): Beta Stage - MVP**
     - [x] Initial repository structure
     - [x] Initial GitHub Actions CI setup
-    - [ ] Implement basic GPIO control
-    - [ ] Basic LED error signaling
-    - [ ] Implement basic SPI control
-    - [ ] Basic LCD interface via SPI
-    - [ ] Implement basic MODBUS control
-    - [ ] Implement basic MODBUS data polling
-    - [ ] Implement HDD-USB mounting and logging daemon
+    - [x] Implement basic GPIO control
+    - [x] Basic LED error signaling
+    - [x] Implement basic SPI control
+    - [x] Basic LCD interface via SPI
+    - [x] Implement basic MODBUS control
+    - [x] Implement basic MODBUS data polling
+    - [x] Implement basic MODBUS scheduled actions.
+    - [ ] Implement HDD-USB mounting and daily-logging daemon
+    - [ ] 'ipk' package management solved
     - [ ] '.defconfig' automatic addition to 'buildroot' compilation script
-    
 
-- **Version 1.0 (Q4 2026): Initial Release**
-    - [ ] Initial GitHub Actions CI/CD setup
+- **Version 1.0 (Q1 2026): Initial Release**
     - [ ] SD Card image generation via `./setup.sh` script
 
 - **Future Ideas (No ETA):**
-    - [ ] UPS communication for controlled and safe HDD and embedded system shutdown
+    - [ ] Buildroot -> Yocto
+    - [ ] Refactor to C/C++
+    - [ ] Refator MRAA to Linux Standard API
+    - [ ] SSH Tunnelling for Encrypted Modbus Communication
 
 ## Acknowledgements
 
