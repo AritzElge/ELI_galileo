@@ -52,5 +52,5 @@ def calculate_sleep_time():
 
 
 if __name__ == "__main__":
-    '''Main execution point for the sleep time calculator'''
+    """Main execution point for the sleep time calculator"""
     calculate_sleep_time()
