@@ -13,7 +13,10 @@ SCHEDULE_JSON_LOCK = "/tmp/schedule_app.lock"
 SCHEDULE_FILE = "schedule.json"
 
 def calculate_sleep_time():
-
+    """
+    Utility script to calculate the next sleep duration fo the daemon.sh
+    Outputs the number of seconds to sleep to stdout
+    """
     # --- MUTEX TO PROTECT THE READING ---
     with FileLock(SCHEDULE_JSON_LOCK):
         try:
