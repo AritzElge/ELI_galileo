@@ -49,7 +49,7 @@ def run_polling_daemon():
     for device in devices:
         if device.get("type") == "sensor":
                 print(f"Calling get_sensor_reg for {device['label']} " \
-                f"(will use hardware mutex internally)...")
+                      f"(will use hardware mutex internally)...")
             get_sensor_reg(device["label"], device["ip"], device["port"], device["length"])
 
 if __name__ == "__main__":
