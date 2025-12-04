@@ -14,11 +14,12 @@ Dependencies:
 ...
 """
 
+import os
 import json
 from filelock import FileLock
 from modbus_client import get_sensor_reg
 
-# Mutex to protect the sensors.json file ONLY
+# Mutex to protect the sensors.json file
 SENSORS_JSON_LOCK = "/tmp/sensors_app.lock"
 SENSORS_FILE = "sensors.json"
 
@@ -35,11 +36,11 @@ def run_polling_daemon():
     """
 
     devices = []
-    
+
     # --- 1. LOCK, READ JSON, AND RELEASE JSON MUTEX ---
     with FileLock(SENSORS_JSON_LOCK):
         print(f"Process {os.getpid()}: JSON Mutex acquired for reading sensors.json.")
-        with open(SENSORS_FILE, "r") as f:
+        with open(SENSORS_FILE, "r", encoding='utf-8') as f:
             devices = json.load(f)
         print(f"Process {os.getpid()}: JSON Mutex released.")
 

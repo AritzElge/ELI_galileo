@@ -16,12 +16,12 @@ Note:
     Designed for use with polling_daemon.py and slaves.json configuration.
 """
 
+import os
 from datetime import datetime
 from filelock import FileLock
 from pymodbus.client.sync import ModbusTcpClient
 
-# Mutex file for FileLock:
-MODBUS_CLIENT_MUTEX = "/tmp/modbus_client.lock" 
+MODBUS_CLIENT_MUTEX = "/tmp/modbus_client.lock"
 
 def get_sensor_reg(slave_label, slave_ip, coms_port, data_length):
     """
@@ -41,16 +41,21 @@ def get_sensor_reg(slave_label, slave_ip, coms_port, data_length):
     """
     with FileLock(MODBUS_CLIENT_MUTEX):
         client = ModbusTcpClient(slave_ip, port=coms_port)
-        client.connect()
+        try:
+            # Added a basic check for connection success
+            if not client.connect():
+                print(f"Connection failed to {slave_ip}:{coms_port}")
+                return
 
-        result = client.read_holding_registers(address=0, count=data_length, slave=1)
-        if not result.isError():
-            print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} : {slave_label} : "
-                f"{slave_ip} : {coms_port} : {result.registers}")
-        else:
-            print("Error:", result)
-
-        client.close()
+            result = client.read_holding_registers(address=0, count=data_length, slave=1)
+            if not result.isError():
+                print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} : {slave_label} : "
+                    f"{slave_ip} : {coms_port} : {result.registers}")
+            else:
+                print(f"Error for {slave_label}: {result}")
+        finally:
+            # Ensures the client always closes, even if an error occurs above
+            client.close()
 
 
 def set_actuator_reg(actuator_label, actuator_ip, coms_port, register_address, value):
@@ -72,13 +77,18 @@ def set_actuator_reg(actuator_label, actuator_ip, coms_port, register_address, v
     """
     with FileLock(MODBUS_CLIENT_MUTEX):
         client = ModbusTcpClient(actuator_ip, port=coms_port)
-        client.connect()
+        try:
+            # Added a basic check for connection success
+            if not client.connect():
+                print(f"Connection failed to {actuator_ip}:{coms_port}")
+                return
 
-        result = client.write_register(address=register_address, value=value, device_id=1)
-        if not result.isError():
-            print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} : {actuator_label} : "
-                f"{actuator_ip} : {coms_port} : SET {register_address} = {value}")
-        else:
-            print("Error:", result)
-
-        client.close()
+            result = client.write_register(address=register_address, value=value, device_id=1)
+            if not result.isError():
+                print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} : {actuator_label} : "
+                    f"{actuator_ip} : {coms_port} : SET {register_address} = {value}")
+            else:
+                print(f"Error for {actuator_label}: {result}")
+        finally:
+            # Ensures the client always closes, even if an error occurs above
+            client.close()

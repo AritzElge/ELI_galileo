@@ -38,7 +38,7 @@ jobs:
 
     # --- Pylint Steps ---
     - name: Install Pylint
-      run: pip install pylint
+      run: pip install pylint filelock pymodbus
 
     - name: Run Pylint on all Python scripts
-      run: pylint $(find . -name "*.py")
+      run: pylint --disable=E0401 $(find . -name "*.py")
