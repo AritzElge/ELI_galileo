@@ -1,0 +1,14 @@
+[
+    {
+        "label": "Temp_Sensor_1",
+        "ip": "XXX.XXX.XXX.XXX",
+        "port": 5020,
+        "length": 2
+    },
+    {
+        "label": "Humidity_Sensor_1",
+        "ip": "XXX.XXX.XXX.XXX",
+        "port": 5020,
+        "register_address": 1
+    }
+]   
