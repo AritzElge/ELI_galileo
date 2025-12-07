@@ -15,9 +15,64 @@ This directory contains the detailed technical documentation, specifications, an
 *Note: The technical specification for the proprietary Modbus interface and custom modules is currently pending public documentation.
 
 ## 2. System Architecture
-
-*   [Data Flow Diagram and Software Architecture](architecture_diagram.pdf)
+    
 *   [Hardware Connection Schematic (SPI Pinout)](hardware_schematic.pdf)
+*   **Data Flow Diagram and Software Architecture:**
+```mermaid
+graph TD
+    %% Define the external systems
+    A[Sensors/Actuators Modbus TCP/IP]
+    
+    %% Define the software components (Daemons and Scripts)
+    D(start_polling_daemon.sh)
+    E(start_schedule_daemon.sh)
+    F(start_lcd_daemon.sh)
+    
+    G(polling_daemon.py)
+    H(schedule_daemon.py)
+    I(lcd_daemon)
+    J(error_code_blink.c)
+    
+    %% Define hardware resources and IPC
+    K[USB HDD - Logs/Data] 
+    L[Status files IPC]
+    M(LED de Estado)
+    N(LCD SPI Screen)
+
+    %% Define data flow
+    A -- Ethernet/Modbus --> G
+
+    G -- Write Logs --> K
+    H -- Write Logs --> K
+    I -- Write Logs --> K
+
+    D -- Launch and Monitor --> G
+    E -- Launch and Monitor --> H
+    F -- Launch and Monitor --> I
+    
+    G -- Update Status --> L
+    H -- Update Status --> L
+    I -- Update Status --> L
+    
+    L -- Read Status periodically --> J
+    J -- Controls --> M
+    I -- Controls --> N
+
+    %% Styles
+    style A fill:#FF4500,stroke:#333,stroke-width:2px,color:#FFFFFF
+    style D fill:#00008B,stroke:#333,stroke-width:2px,color:#FFFFFF
+    style E fill:#00008B,stroke:#333,stroke-width:2px,color:#FFFFFF
+    style F fill:#00008B,stroke:#333,stroke-width:2px,color:#FFFFFF
+    style G fill:#00008B,stroke:#333,stroke-width:2px,color:#FFFFFF
+    style H fill:#00008B,stroke:#333,stroke-width:2px,color:#FFFFFF
+    style I fill:#00008B,stroke:#333,stroke-width:2px,color:#FFFFFF
+    style J fill:#00008B,stroke:#333,stroke-width:2px,color:#FFFFFF
+    style K fill:#32CD32,stroke:#333,stroke-width:2px,color:#FFFFFF
+    style L fill:#32CD32,stroke:#333,stroke-width:2px,color:#FFFFFF
+    style M fill:#FF4500,stroke:#333,stroke-width:2px,color:#FFFFFF
+    style N fill:#D3D3D3,stroke:#333,stroke-width:2px,color:#00008B
+```
+
 
 ## 3. Operational Manuals and Procedures
 
