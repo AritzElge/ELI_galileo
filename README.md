@@ -33,7 +33,6 @@ This project was selected as a technical challenge due to the platform`s discont
 ## Key Features
 
 *   **MODBUS TCP/IP Management:** Full communication and control of smart devices (sensors and actuators) over the local network.
-*   **SPI Interface:** Control of an LCD screen for local system status and error visualization.
 *   **Data Persistence:** Use of an external USB-HDD to store daemons and logs, mitigating the degradation of the OS microSD card.
 *   **Secure Updates:** *In-situ* update mechanism via a USB pendrive and package management with version verification.
 *   **Visual Diagnostics:** Status LED for error code indication.
@@ -43,7 +42,6 @@ This project was selected as a technical challenge due to the platform`s discont
 
 *   **Mainboard:** Intel Galileo Gen 2 (with CR2032 battery for RTC)
 *   **Storage:** MicroSD card (OS) and external USB-HDD (Daemons/Logs)
-*   **Interfaces:** LCD Screen (via SPI), Status LED (Built-In), miniPCIExpress USB port expander, native Host-USB Port.
 *   **Network:** Ethernet connection for MODBUS TCP/IP.
 
 ## System Requirements
@@ -89,7 +87,6 @@ A tool to write the generated `sdcard.img` to the MicroSD card:
 *   **Master Platform:** Intel Galileo Gen 2 (Quark SoC X1000, Linux).
 *   **Languages Used:** Ash shell, Python 3, Native C, Modern C++.
 *   **Communication Protocol:** Modbus TCP/IP.
-*   **Hardware Interfaces:** SPI (for LCD), GPIO (for multiplexer and LED control), Ethernet (for Modbus communication).
 *   **Build System Tool:** **Buildroot** (used to generate the toolchain and the final Linux image).
 *   **Coding Standards and Safety:** Hardware communication (`GPIO`, `SPI`) is managed using the **MRAA** library. Code quality and safety are ensured through **continuous static analysis** (using `CppCheck`, `Pylint`, and `ShellCheck`), minimizing common vulnerabilities and ensuring system stability.
 *   Full automation of the Continuous Integration (CI) using **GitHub Actions**.
@@ -101,8 +98,7 @@ A tool to write the generated `sdcard.img` to the MicroSD card:
 
 The system consists of several daemons that communicate internally:
 
-*   `error_code_blink` (C): Provides continuous **heartbeat signaling** (1Hz pulse) when the system is healthy and switches to specific LED blink patterns (long/short combinations) for detailed error reporting as a fallback mechanism if the primary LCD display fails.
-*   `lcd_daemon` (C/C++): Controls the SPI display and shows system status.
+*   `error_code_blink` (C): Provides continuous **heartbeat signaling** (1Hz pulse) when the system is healthy and switches to specific LED blink patterns (long/short combinations) for detailed error reporting as a fallback mechanism.
 *   `schedule_daemon` (Python 3): Manages the main scheduler for actuator actions (executed via `start_schedule_daemon.sh`).
 *   `polling_daemon` (Python 3): Manages the loop for sensor data acquisition (executed via `start_polling_daemon.sh`).
 *   `modbus_client` (Python 3 Module): Manages network communication.
@@ -112,7 +108,7 @@ The system consists of several daemons that communicate internally:
 *   **Hybrid CI/CD Strategy:** DDecision not to compile the entire Buildroot image in the cloud due to the performance and time limitations of public CI/CD runners. The resulting toolchain is generated locally. The GitHub Actions pipeline is exclusively focused on static code validation (`Pylint`, `CppCheck`, `ShellCheck`) to ensure quality before the final local compilation.
 *   **Reproducibility of the Buildroot:** Use of bash scripts and `defconfig` files to automate the complete configuration of the Buildroot workspace, ensuring reproducible builds locally without manual intervention.
 *   **Optimal Language Selection (Multi-Level Approach):** Decision to select the most suitable language for each task based on criticality and required performance. 
-    *   **C/C++:** Used for performance-critical tasks like hardware drivers (LCD control, error blinking), leveraging the **MRAA library** for simplified and portable control.
+    *   **C/C++:** Used for performance-critical tasks like hardware drivers (error blinking), leveraging the **MRAA library** for simplified and portable control.
     *   **Python:** Used for complex logic tasks and system integration (Modbus comms, scheduling) where development speed is key.
     *   **Ash Shell/Bash:** Used exclusively for system initialization, setup scripts, and wrapper execution.
 *   **Resource Management:** Python's built-in features and robust libraries (filelock, for example) are used for safe management of synchronization and inter-process communication.
@@ -168,9 +164,7 @@ Interaction with the system is primarily done via SSH for maintenance and monito
     bash
     tail -f /mnt/hdd/logs/modbus.log
     ```
-*   **Physical Interface:** The onboard LED provides heartbeat signaling and displays specific error codes (see `error_code_blink` daemon documentation). The SPI LCD displays the current system status (IP address, operational status, and sensor readings).
-
-*Note: The user interface via the LCD is still in the early stages of development.*
+*   **Physical Interface:** The onboard LED provides heartbeat signaling and displays specific error codes (see `error_code_blink` daemon documentation). 
 
 ## System Updates
 
@@ -190,8 +184,6 @@ The project is currently in active development. Below are the goals for upcoming
     - [x] Initial GitHub Actions CI setup
     - [x] Implement basic GPIO control
     - [x] Basic LED error signaling
-    - [x] Implement basic SPI control
-    - [x] Basic LCD interface via SPI
     - [x] Implement basic MODBUS control
     - [x] Implement basic MODBUS data polling
     - [x] Implement basic MODBUS scheduled actions.

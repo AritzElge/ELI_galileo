@@ -9,7 +9,7 @@ Before starting the deployment, ensure you have the following items and tools re
     *   MicroSD Card (minimum 4GB).
     *   External USB Hard Drive (HDD) for logs and daemons.
     *   Ethernet Cable.
-    *   Modbus Modules and SPI LCD connected according to the Hardware Connection Schematic.
+    *   Modbus Modules.
 *   Tools: dd or Balena Etcher for flashing the image.
 
 ## Operating System Image Generation
@@ -66,7 +66,6 @@ Upon successful initial boot, the following procedures must be executed via SSH 
 ```
 systemctl status domotica-schedule-daemon
 systemctl status domotica-polling-daemon
-systemctl status lcd-daemon
 # Verify other daemons...
 ```
 2. **Data Integrity and Logging Verification**
@@ -80,9 +79,6 @@ date
 tail -n 1 /mnt/hdd/logs/system.log
 ```
 3. **Hardware Interface Testing**
-*   **SPI LCD Test:**
-    *   **Procedure:** Execute a test script to display a predefined message (e.g., "V&V Pass") on the LCD screen.
-    *   **Expected Result:** The message appears correctly on the SPI LCD.
 *   **Modbus Communication Test:**
     *   **Procedure:** Use a command-line utility or Python test script to poll a known sensor value from one of the Modbus devices.
     *   **Expected Result:** A valid data reading is returned (e.g., temperature value) and logged without errors in /mnt/hdd/logs/modbus.log.

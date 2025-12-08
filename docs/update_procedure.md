@@ -47,7 +47,7 @@ The update script performs the following security checks sequentially:
     tail -f /mnt/hdd/logs/system.log
     ```
 3.  **System Reboot:** A full reboot of the board is required for all changes to take effect and for the new daemons to start correctly.
-4.  **Final Confirmation:** After the reboot, verify the new software version via SSH or the LCD screen (if the interface allows).
+4.  **Final Confirmation:** After the reboot, verify the new software version via SSH.
 
 ## Error Handling and Rollback
 The update mechanism incorporates basic error handling, but operator intervention may be required in certain failure scenarios.

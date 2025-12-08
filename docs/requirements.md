@@ -9,9 +9,8 @@ This document describes the functional and non-functional requirements (F/NF) fo
 *   **FR-002**	The system shall establish full MODBUS TCP/IP communication with slave devices on the local network.	**Critical**
 *   **FR-003**	The system shall perform periodic polling of configured smart sensors.	**High**
 *   **FR-004**	The system shall execute scheduled actions on smart actuators according to the defined configuration.	**High**
-*   **FR-005**	The system shall display the current operational status and key sensor data on the SPI LCD screen.	**Medium**
-*   **FR-006**	The system shall log all operational events, errors, and sensor readings to dedicated log files.	**Critical**
-*   **FR-007**	The system shall support application software updates via an offline USB device with version verification.	**Critical**
+*   **FR-005**	The system shall log all operational events, errors, and sensor readings to dedicated log files.	**Critical**
+*   **FR-006**	The system shall support application software updates via an offline USB device with version verification.	**Critical**
 
 ## 2. Non-Functional Requirements (NFR)
 *Non-functional requirements describe how the system should be (quality, performance, security).*
@@ -22,7 +21,6 @@ This document describes the functional and non-functional requirements (F/NF) fo
 *   **NFR-004**	Remote access (SSH) shall be restricted to public/private key authentication only.	**Security**
 *   **NFR-005**	The system shall use static ARP tables and iptables to implement a "Defense-in-Depth" strategy on the local network.	**Security**
 *   **NFR-006**	The system shall use the RTC battery (CR2032) to ensure accurate timestamping of all logs.	**Data Integrity**
-*   **NFR-007**	The system shall provide a fallback diagnostic mechanism using LED error codes if the network or LCD fails.	**Maintainability**
 
 
 

@@ -15,7 +15,6 @@ The onboard LED provides immediate system status feedback. This is the primary d
 
 | Pattern (Long-Short) | Status Description                                 | Troubleshooting Steps                                                                           |
 |----------------------|----------------------------------------------------|-------------------------------------------------------------------------------------------------|
-|    S-S-S-L           | LCD daemon error                                   | 1. SSH in, check systemctl status lcd-daemon. 2. Check physical SPI wiring (Hardware Schematic).|
 |    S-S-L-S           | Polling daemon error                               | 1. SSH in, check systemctl status domotica-modbus-client. 2. Check network connectivity.        |
 |    S-S-L-L           | Scheduling daemon error                            | 1.  SSH in, check systemctl status domotica-schedule-daemon. 2. Check Python dependencies.      |
 |    L-S-L-S           | HDD Mount Failure                                  | 1. Check physical USB connection. 2. Verify HDD formatting (ext4). 3. Reboot system.            |
