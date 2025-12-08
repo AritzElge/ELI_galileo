@@ -15,7 +15,6 @@ This directory contains the detailed technical documentation, specifications, an
 
 ## 2. System Architecture
     
-*   [Hardware Connection Schematic (SPI Pinout)](hardware_schematic.pdf)
 *   **Data Flow Diagram and Software Architecture:**
 ```mermaid
 graph TD
