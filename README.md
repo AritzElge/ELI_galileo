@@ -191,11 +191,11 @@ The project is currently in active development. Below are the goals for upcoming
     - [ ] `ipk` package management for Robust Field Updates
     - [ ] Automated Build Reproducibility via `.defconfig` integration
     - [ ] Implement **automated Unit Testing** (e.g., Pytest for Python modules)
-    - [ ] Implement secure SSH access (key-only authentication, disabled root password)
-    - [ ] Configure static ARP tables and iptables firewall rules
 
 - **Version 1.0 (Q1 2026): Initial Release**
     - [ ] SD Card image generation via `./setup.sh` script
+    - [ ] Implement secure SSH access (key-only authentication, disabled root password)
+    - [ ] Configure static ARP tables and iptables firewall rules
     - [ ] Reliability Target: Implement automatic system health-check and watchdog service
 
 - **Future Ideas (No ETA):**
