@@ -36,7 +36,7 @@ def get_sensor_reg(slave_label, slave_ip, coms_port, data_length):
         data_length (int): Number of contiguous registers to read.
 
     Returns:
-        None: Prints result or error to stdout.
+        result.registers: Prints register retrieved.
     """
     with FileLock(MODBUS_CLIENT_MUTEX):
         client = ModbusTcpClient(slave_ip, port=coms_port)
@@ -55,7 +55,7 @@ def get_sensor_reg(slave_label, slave_ip, coms_port, data_length):
         finally:
             # Ensures the client always closes, even if an error occurs above
             client.close()
-
+        return result.registers
 
 def set_actuator_reg(actuator_label, actuator_ip, coms_port, register_address, value):
     """
