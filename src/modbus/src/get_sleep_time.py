@@ -4,13 +4,24 @@ Utility script to calculate the next sleep duration for the daemon.sh script.
 Outputs the number of seconds to sleep to stdout.
 """
 
+import os         # Import os to resolve E0602 errors for 'os'
+import sys        # Import sys to resolve E0602 errors for 'sys'
 import json
 import datetime
-import sys
+
+# Get the absolute path of the directory where this script is located
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Add this directory to Python's module search path (sys.path)
+if script_dir not in sys.path:
+    sys.path.append(script_dir)
+
+# --- Move imports of local modules to the top (C0413 fix) ---
 from filelock import FileLock
+# -----------------------------------------------------------
 
 SCHEDULE_JSON_LOCK = "/tmp/schedule_app.lock"
-SCHEDULE_FILE = "schedule.json"
+SCHEDULE_FILE = "/mnt/hdd/daemons/modbus/schedule.json"
 
 def calculate_sleep_time():
     """
