@@ -43,17 +43,18 @@ def get_sensor_reg(slave_label, slave_ip, coms_port, data_length):
         try:
             if not client.connect():
                 print(f"Connection failed to {slave_ip}:{coms_port}")
-                return None # Ensure explicit None return
+                return None
 
             result = client.read_holding_registers(address=0, count=data_length, slave=1)
             if not result.isError():
                 print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} : {slave_label} : "
-                    f"{slave_ip} : {coms_port} : {result.registers}")
-                return result.registers # Return successful value
-            else:
-                print(f"Error for {slave_label}: {result}")
-                return None # Ensure explicit None return
+                      f"{slave_ip} : {coms_port} : {result.registers}")
+                return result.registers
+
+            print(f"Error for {slave_label}: {result}")
+            return None
         finally:
+            # Ensures the client always closes, even if an error occurs above
             client.close()
 
 
@@ -72,22 +73,23 @@ def set_actuator_reg(actuator_label, actuator_ip, coms_port, register_address, v
         value (int): Value to write (0-65535).
 
     Returns:
-        bool: True if successful, otherwise False or None on connection error.
+        bool: True if successful, otherwise False.
     """
     with FileLock(MODBUS_CLIENT_MUTEX):
         client = ModbusTcpClient(actuator_ip, port=coms_port)
         try:
             if not client.connect():
                 print(f"Connection failed to {actuator_ip}:{coms_port}")
-                return False # Ensure consistent boolean return
+                return False
 
             result = client.write_register(address=register_address, value=value, device_id=1)
             if not result.isError():
                 print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} : {actuator_label} : "
-                    f"{actuator_ip} : {coms_port} : SET {register_address} = {value}")
-                return True # Ensure consistent boolean return
-            else:
-                print(f"Error for {actuator_label}: {result}")
-                return False # Ensure consistent boolean return
+                      f"{actuator_ip} : {coms_port} : SET {register_address} = {value}")
+                return True
+
+            # R1705 Fix: No 'else' needed after a 'return'
+            print(f"Error for {actuator_label}: {result}")
+            return False
         finally:
             client.close()

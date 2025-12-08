@@ -18,7 +18,6 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 if script_dir not in sys.path:
     sys.path.append(script_dir)
 
-# --- Move imports of local modules to the top (C0413 fix) ---
 from filelock import FileLock
 from modbus_client import get_sensor_reg # Assumed to return data
 # -----------------------------------------------------------
@@ -28,7 +27,7 @@ SENSORS_JSON_LOCK = "/tmp/sensors_app.lock"
 SENSORS_FILE = "/mnt/hdd/daemons/modbus/sensors.json"
 
 # Define the primary location for the CSV file (on the HDD)
-CSV_FILE_PATH = "/mnt/hdd/logs/sensor_readings.csv" 
+CSV_FILE_PATH = "/mnt/hdd/logs/sensor_readings.csv"
 # Define the fallback location (in RAM)
 TMP_CSV_FILE_PATH = "/tmp/sensor_readings.csv"
 
@@ -45,16 +44,16 @@ def run_polling_daemon():
         print(f"Process {os.getpid()}: JSON Mutex acquired for reading {SENSORS_FILE}.")
         try:
             # Add encoding='utf-8' for W1514 fix
-            with open(SENSORS_FILE, "r", encoding='utf-8') as f: 
+            with open(SENSORS_FILE, "r", encoding='utf-8') as f:
                 devices = json.load(f)
             print(f"Read {len(devices)} devices from JSON configuration.")
         except FileNotFoundError:
             # Use sys.stderr instead of os.sys.stderr
-            print(f"ERROR: Configuration file {SENSORS_FILE} not found.", file=sys.stderr) 
+            print(f"ERROR: Configuration file {SENSORS_FILE} not found.", file=sys.stderr)
             return
         except json.JSONDecodeError:
             # Use sys.stderr instead of os.sys.stderr
-            print(f"ERROR: Failed to decode JSON from {SENSORS_FILE}", file=sys.stderr) 
+            print(f"ERROR: Failed to decode JSON from {SENSORS_FILE}", file=sys.stderr)
             return
 
         print(f"Process {os.getpid()}: JSON Mutex released.")
@@ -82,11 +81,11 @@ def run_polling_daemon():
             if device.get("type") == "sensor":
                 print(f"Calling get_sensor_reg for {device['label']} "
                       f"(will use hardware mutex internally)...") # C0301 fix
-                
+
                 # CAPTURE the data returned by the Modbus client
-                sensor_data = get_sensor_reg(device["label"], device["ip"], 
+                sensor_data = get_sensor_reg(device["label"], device["ip"],
                                              device["port"], device["length"]) # C0301 fix
-                
+
                 if sensor_data is not None:
                     # Create a dictionary for the CSV row (C0301 fix below)
                     row = {
