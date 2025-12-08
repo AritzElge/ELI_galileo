@@ -48,6 +48,11 @@ else
 fi
 
 echo "Buildroot configuration complete."
-echo "Now, run 'make galileo_defconfig' , 'make menuconfig', 'make linux-menuconfig' and 'make' in the 'buildroot/' directory."
+
+echo "Copying init.d Scripts..."
+./scripts/copy_init_scripts.sh
+
+echo "Packaging Daemons..."
+./scripts/make_ipk.sh
 
 exit 0
