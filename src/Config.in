@@ -1,2 +1,0 @@
-# ~/projects/my_buildroot_external/Config.in
-source "package/ELI_galileo/Config.in"

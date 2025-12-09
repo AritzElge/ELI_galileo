@@ -3,7 +3,7 @@
 # --- Script Configuration ---
 BUIDLROOT_VERSION=2019.02
 REPO_URL="git://git.buildroot.net/buildroot.git"
-
+PROJECT_PATH=$(pwd)
 # Install Buildroot dependencies
 
 sudo ./scripts/install_dependencies.sh
@@ -48,11 +48,34 @@ else
 fi
 
 echo "Buildroot configuration complete."
+cd "$(PROJECT_PATH)"
 
+# Copy init.d Scripts
 echo "Copying init.d Scripts..."
 ./scripts/copy_init_scripts.sh
 
-echo "Packaging Daemons..."
-./scripts/make_ipk.sh
+# Copy project .config to buildroot
+echo "Copy .config to buildroot directory..."
+cp ./.config ./galileo/buildroot/.config
+
+# Adquire the toolchains
+echo "Compile buildroot for C and C++ toolchain generation..."
+cd galileo
+cd buildroot
+make -j$(($(nproc) - 1))
+
+# Compile C and C++ daemons:
+
+
+# Copy all the daemons
+echo "Copying daemons..."
+cd "$(PROJECT_PATH)"
+./scripts/copy_daemons.sh
+
+# Final buildroot compilation
+echo "Final Buildroot compilation..."
+cd galileo
+cd buildroot
+make -j$(($(nproc) - 1))
 
 exit 0
