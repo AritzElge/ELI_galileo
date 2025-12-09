@@ -21,12 +21,14 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        # Instala las librerías necesarias para que el test y el código principal funcionen
+        # Install libraries for test and main code to work
         pip install filelock pymodbus==2.5.3 pyserial freezegun
 
     - name: Run tests
       run: |
         # Test execution in test/ folder
         cd tests/
-        # The test script uses relative paths to find the code
+        # The test for polling daemon
         python3 test_polling_daemon.py
+        # The test for schedule daemon
+        python3 test_schedule_daemon.py
