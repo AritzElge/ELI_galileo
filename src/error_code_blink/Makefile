@@ -13,16 +13,16 @@ CROSS_COMPILE := $(shell find $(BUILDROOT_DIR)/output/host/bin -name "*i586-linu
 # Define the root path of the Buildroot output
 BUILDROOT_OUTPUT ?= $(BUILDROOT_DIR)/output
 
-# Define the staging directory where mraa headers and libs are installed
+# Define the staging directory where lgpiod headers and libs are installed
 STAGING_DIR := $(BUILDROOT_OUTPUT)/host/i586-buildroot-linux-uclibc/sysroot
 
-# Add the include path for mraa headers (-I...)
-# Add the library path for mraa library file (-L...)
-MRAA_FLAGS := -I$(STAGING_DIR)/usr/include -L$(STAGING_DIR)/usr/lib
+# Add the include path for lgpiod headers (-I...)
+# Add the library path for lgpiod library file (-L...)
+LGPIOD_FLAGS := -I$(STAGING_DIR)/usr/include -L$(STAGING_DIR)/usr/lib
 
 # Linker Flags (LDFLAGS): 
-# Add -lmraa to link against the mraa library
-LDFLAGS := -lmraa
+# Add -lgpiod to link against the -lgpiod library
+LDFLAGS := -lgpiod
 
 # Compiler Flags (CFLAGS):
 # -Wall and -Wextra enable useful warnings.

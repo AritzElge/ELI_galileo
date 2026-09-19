@@ -1,8 +1,7 @@
 #include <stdio.h>       // POSIX/Linux file I/O (printf, stderr, fopen, fscanf)
 #include <unistd.h>      // POSIX functions (sleep())
 #include <time.h>        // POSIX functions (nanosleep(), struct timespec)
-#include <mraa/gpio.h>   // MRAA GPIO library
-#include <mraa/common.h> // MRAA common definitions
+#include <gpiod.h>       // libgpiod GPIO library
 #include <fcntl.h>       // POSIX file control (open, read)
 #include <sys/stat.h>    // POSIX file stats (open, read)
 #include <dirent.h>      // POSIX directory handling (opendir, readdir)
@@ -23,12 +22,16 @@
 // MUX GPIO pinout (Configured in main)
 #define IO_EXP_MUX_SEL1 30  
 #define IO_EXP_MUX_SEL2 31  
-#define QUARK_GPIO_46   46  
+#define QUARK_GPIO_46   46
+
+//GPIO chip and pin definitions
+#define GPIO_CHIP_NAME   "/dev/gpiochip0"
+#define LED_PIN          7
 
 // -- Function Prototypes (Declarations) --
 inline int get_operation_status(void);
-void do_blink(mraa_gpio_context gpio_pin, int seconds, int nanoseconds);
-int configure_gpio_output_raw(mraa_gpio_context gpio_pin);
+void do_blink(struct gpiod_line *line, int seconds, int nanoseconds);
+int configure_gpio_output_raw(struct gpiod_line *line, const char *consumer);
 
 // -- Function Implementations (Definitions) --
 /** int get_operation_status()
@@ -96,75 +99,84 @@ inline int get_operation_status()
  * This function turns the specified GPIO pin on for a defined duration (seconds/nanoseconds ON time), 
  * then turns it off for a standard short duration (T_SHORT_S/T_SHORT_NS OFF time).
  * 
- * @param gpio_pin The MRAA GPIO context object representing the physical pin.
+ * @param line The GPIO line structure representing the physical pin.
  * @param seconds The number of seconds the pin should remain ON.
  * @param nanoseconds The number of nanoseconds the pin should remain ON.
  */
-void do_blink(mraa_gpio_context gpio_pin, int seconds, int nanoseconds)
+void do_blink(struct gpiod_line *line, int seconds, int nanoseconds)
 {
     struct timespec ts_on = { .tv_sec = seconds, .tv_nsec =nanoseconds };
     struct timespec ts_off = { .tv_sec = T_SHORT_S, .tv_nsec = T_SHORT_NS }; 
 
-    mraa_gpio_write(gpio_pin, 1);
+    gpiod_line_set_value(line, 1);
     nanosleep(&ts_on, NULL);
-    mraa_gpio_write(gpio_pin, 0);
+    gpiod_line_set_value(line, 0);
     nanosleep(&ts_off, NULL);
 }
 
 /**
- * @brief Configures a given MRAA GPIO pin context for output direction.
+ * @brief Configures a given GPIO pin context for output direction.
  *
  * This function sets the specified GPIO pin direction to output mode using the 
- * MRAA library. It performs basic validation to ensure the context object is valid
+ * libgpiod library. It performs basic validation to ensure the context object is valid
  * before attempting configuration.
  *
- * @param gpio_pin The MRAA GPIO context object representing the physical pin.
+ * @param line The GPIO line structure representing the physical pin.
+* @param consumer A string identifier for the consumer of the GPIO line (used by the kernel)
  * @return Returns 0 on success, 99 if the initial GPIO context is NULL, 
- *         or an MRAA error code integer if setting the direction fails.
+ *         or an error code integer if setting the direction fails.
  */
-int configure_gpio_output_raw(mraa_gpio_context gpio_pin)
+int configure_gpio_output_raw(struct gpiod_line *line, const char *consumer)
 {
-    mraa_result_t result = MRAA_SUCCESS;
+    int ret;
   
-    if (gpio_pin == NULL)
+    if (line == NULL)
     { 
-        fprintf(stderr, "MRAA Init Error. Check configuration.\n");
+        fprintf(stderr, "libgpiod Init Error. Check configuration.\n");
         return 99; 
     }
 
-    result = mraa_gpio_dir(gpio_pin, MRAA_GPIO_OUT);
+    ret = gpiod_line_request_output(line, consumer, 0);
 
-    if (result != MRAA_SUCCESS)
+    if (ret < 0)
     {
-        fprintf(stderr, "MRAA DIrection Error\n");
-        return (int)result;
+        fprintf(stderr, "libgpiod Direction Error\n");
+        return ret;
     }
 
     return 0;
 }
 
-
 int main()
 {
-    // Initialize MRAA library and configure MUX (your original main logic)
-    mraa_init();
+    struct gpiod_chip *chip = gpiod_chip_open(GPIO_CHIP_NAME);
+    if (!chip)
+    {
+        fprintf(stderr, "Failed to open GPIO chip %s\n", GPIO_CHIP_NAME);
+        return 1;
+    }
+
+    // Configure MUX lines
     {
         int mux_gpio[] = {IO_EXP_MUX_SEL1, IO_EXP_MUX_SEL2, QUARK_GPIO_46}; 
         for (int i_gpio = 0; i_gpio < 3; i_gpio++)
         {
-            mraa_gpio_context mux_gpio_pin = mraa_gpio_init_raw(mux_gpio[i_gpio]);
-            if (0 != configure_gpio_output_raw(mux_gpio_pin))
+            struct gpiod_line *mux_line = gpiod_chip_get_line(chip, mux_gpio[i_gpio]);
+
+            if (0 != configure_gpio_output_raw(mux_line, "error_code_blink_mux"))
             {
+                gpiod_chip_close(chip);
                 return 1;
             }
-            mraa_gpio_write(mux_gpio_pin, 0);
+            gpiod_line_set_value(mux_line, 0);
         }
     }
 
 	// Configure LED GPIO
-    mraa_gpio_context led_gpio_pin = mraa_gpio_init_raw(7);
-    if (0 != configure_gpio_output_raw(led_gpio_pin))
+    struct gpiod_line *led_line = gpiod_chip_get_line(chip, LED_PIN);
+    if (0 != configure_gpio_output_raw(led_line, "error_code_blink_led"))
     {
+        gpiod_chip_close(chip);
         return 1;
     }
     
@@ -177,10 +189,9 @@ int main()
 		{
             // OK Status: Heartbeat activated
             struct timespec ts_on = { .tv_sec = 0L, .tv_nsec = T_ON_HEARTBEAT };
-            mraa_gpio_write(led_gpio_pin, 1);
+            gpiod_line_set_value(led_line, 1);
             nanosleep(&ts_on, NULL);
-            mraa_gpio_write(led_gpio_pin, 0);
-            // The long pause is handled by the main sleep(1) outside the if/else
+            gpiod_line_set_value(led_line, 0);
         }
         else
         {
@@ -194,11 +205,11 @@ int main()
 		
 		        if (bit == 1)
 		        {
-		            do_blink(led_gpio_pin, T_LONG_S, T_LONG_NS);
+		            do_blink(led_line, T_LONG_S, T_LONG_NS);
 		        }
 		        else
 		        {
-		            do_blink(led_gpio_pin, T_SHORT_S, T_SHORT_NS);
+		            do_blink(led_line, T_SHORT_S, T_SHORT_NS);
 		        }
 		    }
         }
@@ -206,6 +217,7 @@ int main()
         // Main loop pause of 1 second to control the frequency of the loop
         sleep(1);
     }
-	
+	gpiod_chip_close(chip);
+    
     return 0;
 }
