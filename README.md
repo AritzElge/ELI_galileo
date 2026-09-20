@@ -1,5 +1,7 @@
 # Embedded Linux Integration with Intel Galileo Gen 2 (or ELI_galileo)
 
+> Note: This repository reflects an exploratory Proof of Concept (PoC) / MVP developed to validate hardware integration on legacy silicon. The core architecture is being systematically redesigned under formal system engineering principles.
+
 ![Project Status](https://img.shields.io/badge/Project_Status-MVP-blue)
 
 [![Static Analysis](https://github.com/AritzElge/ELI_galileo/actions/workflows/static_analysis.yml/badge.svg)](https://github.com/AritzElge/ELI_galileo/actions/workflows/static_analysis.yml)
