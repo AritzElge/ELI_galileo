@@ -11,22 +11,27 @@
 
 // Time definitions
 #define T_SHORT_S  0L
-#define T_SHORT_NS 200000000       // Short Blink (200ms)
+#define T_SHORT_NS 200000000        // Short Blink (200ms)
 #define T_LONG_S   0L
-#define T_LONG_NS  600000000       // Long Blink (600ms)
-#define T_OFF_SYNC 2               // Long synchronization pause (2 seconds)
-#define T_ON_HEARTBEAT 100000000   // On time for heartbeat blink (100ms)
+#define T_LONG_NS  600000000        // Long Blink (600ms)
+#define T_OFF_SYNC 2                // Long synchronization pause (2 seconds)
+#define T_ON_HEARTBEAT 100000000    // On time for heartbeat blink (100ms)
 
-#define STATUS_DIR "/tmp/status/"  // Directory containing daemon status files
+#define STATUS_DIR "/tmp/status/"   // Directory containing daemon status files
+
+#define ERROR_STATUS_DIR_MISSING 15 // 15 as Cannot read status file OR Status directory missing
 
 // MUX GPIO pinout (Configured in main)
 #define IO_EXP_MUX_SEL1 30  
 #define IO_EXP_MUX_SEL2 31  
 #define QUARK_GPIO_46   46
+#define MUX_GPIO_NULL   99
 
 //GPIO chip and pin definitions
 #define GPIO_CHIP_NAME   "/dev/gpiochip0"
 #define LED_PIN          7
+
+
 
 // -- Function Prototypes (Declarations) --
 inline int get_operation_status(void);
@@ -77,7 +82,7 @@ inline int get_operation_status()
 			{
                 fprintf(stderr, "ERROR: Could not open status file %s\n", path);
                 // Error 15 now indicates "Cannot read status file"
-                if (highest_error == 0) highest_error = 15; 
+                if (highest_error == 0) highest_error = ERROR_STATUS_DIR_MISSING; 
             }
         }
         closedir(d);
@@ -86,7 +91,7 @@ inline int get_operation_status()
 	{
         fprintf(stderr, "WARNING: Status directory %s not found.\n", STATUS_DIR);
         // Error 15 also for "Status directory missing"
-        return 15; 
+        return ERROR_STATUS_DIR_MISSING; 
     }
 
     return highest_error;
@@ -123,7 +128,7 @@ void do_blink(struct gpiod_line *line, int seconds, int nanoseconds)
  *
  * @param line The GPIO line structure representing the physical pin.
 * @param consumer A string identifier for the consumer of the GPIO line (used by the kernel)
- * @return Returns 0 on success, 99 if the initial GPIO context is NULL, 
+ * @return Returns 0 on success, MUX_GPIO_NULL if the initial GPIO context is NULL, 
  *         or an error code integer if setting the direction fails.
  */
 int configure_gpio_output_raw(struct gpiod_line *line, const char *consumer)
@@ -132,15 +137,13 @@ int configure_gpio_output_raw(struct gpiod_line *line, const char *consumer)
   
     if (line == NULL)
     { 
-        fprintf(stderr, "libgpiod Init Error. Check configuration.\n");
-        return 99; 
+        return MUX_GPIO_NULL; 
     }
 
     ret = gpiod_line_request_output(line, consumer, 0);
 
     if (ret < 0)
     {
-        fprintf(stderr, "libgpiod Direction Error\n");
         return ret;
     }
 
@@ -158,13 +161,23 @@ int main()
 
     // Configure MUX lines
     {
-        int mux_gpio[] = {IO_EXP_MUX_SEL1, IO_EXP_MUX_SEL2, QUARK_GPIO_46}; 
+        int mux_gpio[] = {IO_EXP_MUX_SEL1, IO_EXP_MUX_SEL2, QUARK_GPIO_46};
         for (int i_gpio = 0; i_gpio < 3; i_gpio++)
-        {
+        {   
+            int mux_configuration_ret_val = 0;
             struct gpiod_line *mux_line = gpiod_chip_get_line(chip, mux_gpio[i_gpio]);
-
-            if (0 != configure_gpio_output_raw(mux_line, "error_code_blink_mux"))
+            
+            mux_configuration_ret_val = configure_gpio_output_raw(mux_line, "error_code_blink_mux");
+            if (0 != mux_configuration_ret_val)
             {
+                if (99 == mux_configuration_ret_val)
+                {
+                    fprintf(stderr, "libgpiod Init Error. Check configuration.\n");
+                }
+                else
+                {
+                    fprintf(stderr, "libgpiod Direction Error\n");
+                }
                 gpiod_chip_close(chip);
                 return 1;
             }
