@@ -37,7 +37,7 @@ This project was selected as a technical challenge due to the platform`s discont
 *   **Data Persistence:** Use of an external USB-HDD to store daemons and logs, mitigating the degradation of the OS microSD card.
 *   **Secure Updates:** *In-situ* update mechanism via a USB pendrive and package management with version verification.
 *   **Visual Diagnostics:** Status LED for error code indication.
-*   **Static ARP-Table:** for protection agains ARP-Poisoning. 
+*   **Static ARP-Table:** for protection against ARP-Poisoning. 
 
 ## Hardware Used
 
