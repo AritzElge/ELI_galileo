@@ -194,6 +194,7 @@ The project is currently in active development. Below are the goals for upcoming
     - [X] Implement **automated Unit Testing** (e.g., Pytest for Python modules)
 
 - **Version 1.0 (Q1 2026): Initial Release**
+    - [x] Refactor MRAA to Linux Standard API
     - [ ] `ipk` package management for Robust Field Updates
     - [ ] Implement secure SSH access (key-only authentication, disabled root password)
     - [ ] Configure static ARP tables and iptables firewall rules
@@ -202,7 +203,6 @@ The project is currently in active development. Below are the goals for upcoming
 - **Future Ideas (No ETA):**
     - [ ] Buildroot -> Yocto
     - [ ] Refactor to C/C++
-    - [ ] Refactor MRAA to Linux Standard API
     - [ ] SSH Tunnelling for Encrypted Modbus Communication
 
 ## Acknowledgements
@@ -219,6 +219,6 @@ The project is currently in active development. Below are the goals for upcoming
 
 ## Contact
 
-Aritz Elgezabal - [LinkedIn Profile URL](https://www.linkedin.com/in/aritzelge/) - aelguezabal010@gmail.com
+Aritz Elgezabal - [LinkedIn Profile URL](https://www.linkedin.com/in/aritzelge/) - aritz@aritzelge.eus
 
 Project Distribution: [github.com](https://github.com/AritzElge/ELI_galileo)
