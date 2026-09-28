@@ -86,7 +86,7 @@ A tool to write the generated `sdcard.img` to the MicroSD card:
 ## Technical Features
 
 *   **Master Platform:** Intel Galileo Gen 2 (Quark SoC X1000, Linux).
-*   **Languages Used:** Ash shell, Python 3, Native C, Modern C++.
+*   **Languages Used:** Ash shell, Python 3, Native C.
 *   **Communication Protocol:** Modbus TCP/IP.
 *   **Build System Tool:** **Buildroot** (used to generate the toolchain and the final Linux image).
 *   **Coding Standards and Safety:** Hardware communication (`GPIO`, `SPI`) is managed using the **MRAA** library. Code quality and safety are ensured through **continuous static analysis** (using `CppCheck`, `Pylint`, and `ShellCheck`), minimizing common vulnerabilities and ensuring system stability.
@@ -193,7 +193,7 @@ The project is currently in active development. Below are the goals for upcoming
     - [X] SD Card image generation via `./setup.sh` script
     - [X] Implement **automated Unit Testing** (e.g., Pytest for Python modules)
 
-- **Version 1.0 (Q1 2026): Initial Release**
+- **Version 1.0 (Q4 2026): Initial Release**
     - [ ] `ipk` package management for Robust Field Updates
     - [ ] Implement secure SSH access (key-only authentication, disabled root password)
     - [ ] Configure static ARP tables and iptables firewall rules
